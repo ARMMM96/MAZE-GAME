@@ -1,13 +1,14 @@
 const { Engine, Render, Runner, World, Bodies } = Matter;
 
-const engine = Engine.create();
 
-const cells = 3;
+
+const cells = 5;
 const width = 600;
 const height = 600;
 
 const unitLength = width / cells;
 
+const engine = Engine.create();
 const { world } = engine;
 const render = Render.create({
     element: document.body,
@@ -15,7 +16,7 @@ const render = Render.create({
     options: {
         wireframes: true,
         width,
-        height,
+        height
     }
 });
 
@@ -30,11 +31,11 @@ const walls = [
     Bodies.rectangle(width / 2, height, width, 40, { isStatic: true }),
     Bodies.rectangle(0, height / 2, 40, height, { isStatic: true }),
     Bodies.rectangle(width, height / 2, 40, height, { isStatic: true })
-]
+];
 World.add(world, walls);
 
 
-// Maze genration
+// Maze generation
 const shuffle = (arr) => {
     let counter = arr.length;
     while (counter > 0) {
@@ -89,7 +90,12 @@ const stepThroughCell = (row, column) => {
         const [nextRow, nextColumn, direction] = neighbor;
 
         // See if that neighbor is out of bounds
-        if (nextRow < 0 || nextRow >= cells || nextColumn < 0 || nextColumn >= cells) {
+        if (
+            nextRow < 0 ||
+            nextRow >= cells ||
+            nextColumn < 0 ||
+            nextColumn >= cells
+        ) {
             continue;
         }
         // If we have visited that neighbor, continue to next neighbor
@@ -108,7 +114,7 @@ const stepThroughCell = (row, column) => {
             horizontals[row][column] = true;
         }
 
-        stepThroughCell(nextColumn, nextColumn);
+        stepThroughCell(nextRow, nextColumn);
     }
 
 
@@ -125,11 +131,29 @@ horizontals.forEach((row, rowIndex) => {
             columnIndex * unitLength + unitLength / 2,
             rowIndex * unitLength + unitLength,
             unitLength,
-            10,
+            5,
             {
                 isStatic: true
             }
         );
         World.add(world, wall);
     });
-})
+});
+
+verticals.forEach((row, rowIndex) => {
+    row.forEach((open, columnIndex) => {
+        if (open) {
+            return;
+        }
+        const wall = Bodies.rectangle(
+            columnIndex * unitLength + unitLength,
+            rowIndex * unitLength + unitLength / 2,
+            5,
+            unitLength,
+            {
+                isStatic: true
+            }
+        );
+        World.add(world, wall);
+    });
+});
